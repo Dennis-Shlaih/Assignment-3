@@ -10,3 +10,4 @@ export interface Book {
     rating?: number,
     dateAdded: number
 }
+
