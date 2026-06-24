@@ -1,14 +1,16 @@
 import {useState} from 'react'
 import SearchBar from './components/SearchBar'
 import StatsBar from './components/StatsBar'
-import type {Book} from './types/Book.ts'
+import SearchResults from './components/SearchResults.tsx'
+import type {BookApi} from './types/BookApi.ts'
 
 function App() {
-  const [results, setResults] = useState<Book[]>([])
+  const [results, setResults] = useState<BookApi[]>([])
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   async function searchBooks(query: string) {
     try {
+      setResults([]);
       setLoading(true);
       setError(null);
       const response = await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=10`);
@@ -31,6 +33,7 @@ function App() {
         <h1 className="mb-6 text-4xl font-bold">Book Tracking App</h1>
         <StatsBar/>
         <SearchBar onSearch={searchBooks}/>
+        <SearchResults loadedData={results}/>
         <div>
         </div>
       </div>
