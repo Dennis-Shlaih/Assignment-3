@@ -1,10 +1,10 @@
 import type {BookApi} from '../types/BookApi.ts'
-
 interface SearchResultsProps {
     loadedData: BookApi[];
+    addBook: (bookApi: BookApi) => void;
 }
 
-function SearchResults({loadedData}: SearchResultsProps) {
+function SearchResults({loadedData, addBook}: SearchResultsProps) {
     
     if (loadedData.length === 0) {
         return <p>No books found.</p>;
@@ -14,8 +14,6 @@ function SearchResults({loadedData}: SearchResultsProps) {
         <ul>
             {loadedData.map((book) => (
                 <li key={book.key}>
-                    <p>{book.title}</p>
-                    <p>{book.author_name?.[0] ?? "Unknown Author"}</p>
                     {book.cover_i ? 
                         (<img
                             src={`https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg`}
@@ -23,8 +21,10 @@ function SearchResults({loadedData}: SearchResultsProps) {
                         />)
                         : (<p>No cover available</p>)
                     }
-                    <p>{book.first_publish_year}</p>
-                    
+                    <p>{book.title}</p>
+                    <p>{book.author_name?.[0] ?? "Unknown Author"}</p>
+                    <p>{book?.first_publish_year ?? "Unknown Year"}</p>
+                    <button onClick={() => addBook(book)}>Add Book</button>
                 </li>
         ))}
         </ul>
