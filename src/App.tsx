@@ -8,7 +8,7 @@ import type {Book} from './types/Book.ts'
 
 
 function App() {
-  const [Library, setLibrary] = useState<Book[]>([]);
+  const [library, setLibrary] = useState<Book[]>([]);
   const [results, setResults] = useState<BookApi[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -23,7 +23,7 @@ function App() {
         throw new Error(`HTTP ${response.status}`);
       }
       const data = await response.json();
-      setResults(data.docs);
+      setResults(data.docs as BookApi[]);
     }
     catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
@@ -44,8 +44,10 @@ function App() {
       dateAdded: Date.now()
     }
     setLibrary(prev => [...prev, book])
-    console.log(Library);
+  }
 
+  function deleteBook(id: string): void {
+    setLibrary(library.filter((book) => id !== book.id));
   }
 
   return (
@@ -53,11 +55,11 @@ function App() {
       <div className="mx-auto max-w-7xl">
         <h1 className="mb-6 text-4xl font-bold">Book Tracking App</h1>
         <StatsBar/>
-        <SearchBar onSearch={searchBooks}/>
-        <SearchResults loadedData={results} addBook={addBook}/>
         <div>
-          <LibraryList libraryList={Library}/>
+          <LibraryList libraryList={library} deleteBook={deleteBook}/>
         </div>
+        <SearchBar onSearch={searchBooks}/>
+        <SearchResults loadedData={results} onAdd={addBook}/>
       </div>
     </div>
   );
