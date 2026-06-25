@@ -8,6 +8,9 @@ interface LibraryListProps {
 }
 
 function LibraryList({libraryList, deleteBook, changeStatus}: LibraryListProps) {
+    if (libraryList.length === 0) {
+        return <p>Your library is empty.</p>;
+    }
     return (
         <ul>
             {libraryList.map((book) => (

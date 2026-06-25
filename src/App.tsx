@@ -43,7 +43,14 @@ function App() {
       status: "to-read",
       dateAdded: Date.now()
     }
-    setLibrary(prev => [...prev, book])
+
+    if (!library.some(b => b.id === book.id)) {
+      setLibrary(prev => [...prev, book])
+    } 
+    
+    else {
+      alert("This book is already in your library.")
+    }
   }
 
   function deleteBook(id: string): void {
