@@ -4,13 +4,17 @@ import type {Book} from '../types/Book.ts'
 interface LibraryListProps {
     libraryList: Book[]
     deleteBook: (id: string) => void
+    changeStatus: (id: string, status: Book["status"]) => void
 }
 
-function LibraryList({libraryList, deleteBook}: LibraryListProps) {
+function LibraryList({libraryList, deleteBook, changeStatus}: LibraryListProps) {
     return (
         <ul>
-            {libraryList.map((book) =>
-            <BookCard key={book.id} book={book} onDelete={deleteBook}/>)}
+            {libraryList.map((book) => (
+            <li key={book.id}>
+                <BookCard book={book} onDelete={deleteBook} onChangeStatus={changeStatus}/>
+            </li>
+    ))}
         </ul>
     );
 }

@@ -12,7 +12,7 @@ function App() {
   const [results, setResults] = useState<BookApi[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   async function searchBooks(query: string) {
     try {
       setResults([]);
@@ -47,7 +47,12 @@ function App() {
   }
 
   function deleteBook(id: string): void {
-    setLibrary(library.filter((book) => id !== book.id));
+    setLibrary(prev => prev.filter(book => book.id !== id));
+  }
+
+  function changeStatus(id: string, status: Book["status"]): void {
+    setLibrary(prev => prev.map(book => book.id === id ? {...book, status} : book));
+    console.log(`Book with ID ${id} status changed to ${status}`);
   }
 
   return (
@@ -56,7 +61,7 @@ function App() {
         <h1 className="mb-6 text-4xl font-bold">Book Tracking App</h1>
         <StatsBar/>
         <div>
-          <LibraryList libraryList={library} deleteBook={deleteBook}/>
+          <LibraryList libraryList={library} deleteBook={deleteBook} changeStatus={changeStatus} />
         </div>
         <SearchBar onSearch={searchBooks}/>
         <SearchResults loadedData={results} onAdd={addBook}/>
