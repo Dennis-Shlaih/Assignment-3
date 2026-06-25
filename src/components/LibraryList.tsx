@@ -12,13 +12,16 @@ function LibraryList({libraryList, deleteBook, changeStatus}: LibraryListProps) 
         return <p>Your library is empty.</p>;
     }
     return (
-        <ul>
+        <div>
+            <ul>
             {libraryList.map((book) => (
-            <li key={book.id}>
-                <BookCard book={book} onDelete={deleteBook} onChangeStatus={changeStatus}/>
-            </li>
-    ))}
+                <li key={book.id}>
+                    <BookCard book={book} onDelete={deleteBook} onChangeStatus={changeStatus}/>
+                </li>
+            ))}
         </ul>
+        </div>
+
     );
 }
 

@@ -12,6 +12,7 @@ function App() {
   const [results, setResults] = useState<BookApi[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [filter, setFilter] = useState<"all" | Book["status"]>("all");
 
   async function searchBooks(query: string) {
     try {
@@ -62,13 +63,26 @@ function App() {
     console.log(`Book with ID ${id} status changed to ${status}`);
   }
 
+  const filteredBooks = filter === "all" ? library : 
+    library.filter(book => book.status === filter);
+
   return (
     <div className="min-h-screen bg-gray-100 p-6">
       <div className="mx-auto max-w-7xl">
         <h1 className="mb-6 text-4xl font-bold">Book Tracking App</h1>
         <StatsBar/>
+        <select 
+          value = {filter}
+          onChange = {(e) => setFilter(e.target.value as "all" | Book["status"])}
+        >
+          <option value="all">All</option>
+          <option value="to-read">To Read</option>
+          <option value="reading">Currently Reading</option>
+          <option value="finished">Finished Reading</option>
+        </select>
         <div>
-          <LibraryList libraryList={library} deleteBook={deleteBook} changeStatus={changeStatus} />
+          <LibraryList libraryList={filteredBooks} deleteBook={deleteBook} changeStatus={changeStatus}/>
+
         </div>
         <SearchBar onSearch={searchBooks}/>
         <SearchResults loadedData={results} onAdd={addBook}/>
