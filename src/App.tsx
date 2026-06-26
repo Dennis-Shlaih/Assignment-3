@@ -13,6 +13,8 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | Book["status"]>("all");
+  const [sortBy, setSortBy] = useState<"title" | "author" | "date">("title")
+  const [sortOrder, setSortOrder] = useState<"ascending" | "descending">("ascending") 
 
   async function searchBooks(query: string) {
     try {
@@ -65,6 +67,29 @@ function App() {
 
   const filteredBooks = filter === "all" ? library : 
     library.filter(book => book.status === filter);
+  
+  function sortBooks(filteredBooks: Book[]): Book[] {
+    if (sortOrder === "ascending") {
+      if (sortBy === "date") {
+        return filteredBooks.sort((a, b) => a.dateAdded - b.dateAdded);
+      }
+      else if (sortBy === "author") {
+        return filteredBooks.sort((a, b) => a.author.localeCompare(b.author));
+      }
+      return filteredBooks.sort((a, b) => a.title.localeCompare(b.title))
+    }
+    else {
+      if (sortBy === "date") {
+        return filteredBooks.sort((a, b) => b.dateAdded - a.dateAdded);
+      }
+      else if (sortBy === "author") {
+        return filteredBooks.sort((a, b) => b.author.localeCompare(a.author));
+      }
+      return filteredBooks.sort((a, b) => b.title.localeCompare(a.title))
+    }
+  }
+
+  const sortedBooks = sortBooks(filteredBooks)
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
@@ -80,8 +105,23 @@ function App() {
           <option value="reading">Currently Reading</option>
           <option value="finished">Finished Reading</option>
         </select>
+        <select 
+          value = {sortBy}
+          onChange = {(e) => setSortBy(e.target.value as "title" | "author" | "date")}
+        >
+          <option value="title">Title</option>
+          <option value="author">Author</option>
+          <option value="date">Date Added</option>
+        </select>
+        <select 
+          value = {sortOrder}
+          onChange = {(e) => setSortOrder(e.target.value as "ascending" | "descending")}
+        >
+          <option value="ascending">Ascending</option>
+          <option value="descending">Descending</option>
+        </select>
         <div>
-          <LibraryList libraryList={filteredBooks} deleteBook={deleteBook} changeStatus={changeStatus}/>
+          <LibraryList libraryList={sortedBooks} deleteBook={deleteBook} changeStatus={changeStatus}/>
 
         </div>
         <SearchBar onSearch={searchBooks}/>
