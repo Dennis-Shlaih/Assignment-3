@@ -44,6 +44,7 @@ function App() {
       publishYear: bookApi.first_publish_year,
       coverID: bookApi.cover_i,
       status: "to-read",
+      rating: null,
       dateAdded: Date.now()
     }
 
@@ -62,9 +63,13 @@ function App() {
 
   function changeStatus(id: string, status: Book["status"]): void {
     setLibrary(prev => prev.map(book => book.id === id ? {...book, status} : book));
-    console.log(`Book with ID ${id} status changed to ${status}`);
   }
 
+  function changeRating(id: string, rating: number): void {
+    setLibrary(prev => prev.map(book => book.id === id ? {...book, rating} : book ))
+    {console.log(rating)}
+  }
+  
   const filteredBooks = filter === "all" ? library : 
     library.filter(book => book.status === filter);
   
@@ -121,7 +126,7 @@ function App() {
           <option value="descending">Descending</option>
         </select>
         <div>
-          <LibraryList libraryList={sortedBooks} deleteBook={deleteBook} changeStatus={changeStatus}/>
+          <LibraryList libraryList={sortedBooks} deleteBook={deleteBook} changeStatus={changeStatus} changeRating={changeRating}/>
 
         </div>
         <SearchBar onSearch={searchBooks}/>

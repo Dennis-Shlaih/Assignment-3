@@ -7,7 +7,7 @@ export interface Book {
     publishYear?: number,
     coverID?: number
     status: status
-    rating?: number,
+    rating?: number | null,
     dateAdded: number
 }
 

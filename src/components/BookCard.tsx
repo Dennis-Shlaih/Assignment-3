@@ -4,6 +4,7 @@ interface BookProp {
     book: Book
     onDelete: (id: string) => void
     onChangeStatus: (id: string, status: Book["status"]) => void
+    onChangeRating: (id: string, status: number) => void
 }
 
 function nextStatus(status: Book["status"]): Book["status"] {
@@ -39,7 +40,7 @@ function renderStatus(status: Book["status"]): string {
     }
 }
 
-function BookCard({book, onDelete, onChangeStatus}: BookProp) {
+function BookCard({book, onDelete, onChangeStatus, onChangeRating}: BookProp) {
     const canGoBackward = book.status !== "to-read" ? true : false;
     const canGoForward = book.status !== "finished" ? true : false;
     
@@ -63,6 +64,13 @@ function BookCard({book, onDelete, onChangeStatus}: BookProp) {
                 <button onClick={() => onChangeStatus(book.id, previousStatus(book.status))}>
                     Back
                 </button>
+            )}
+            {book.status === "finished" && (
+                [1, 2, 3, 4, 5].map(star => (
+                    <button key={star} onClick={() => onChangeRating(book.id, star)}>
+                        {star <= (book.rating ?? 0) ? "★" : "☆"}
+                    </button>
+                ))
             )}
         </div>
     );
