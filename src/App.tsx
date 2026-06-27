@@ -25,6 +25,7 @@ function App() {
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
       }
+
       const data = await response.json();
       setResults(data.docs as BookApi[]);
     }
@@ -69,7 +70,7 @@ function App() {
     setLibrary(prev => prev.map(book => book.id === id ? {...book, rating} : book ))
     {console.log(rating)}
   }
-  
+
   const filteredBooks = filter === "all" ? library : 
     library.filter(book => book.status === filter);
   
@@ -95,12 +96,23 @@ function App() {
   }
 
   const sortedBooks = sortBooks(filteredBooks)
+  const toReadCount = library.filter(book => book.status === "to-read").length;
+  const readingCount = library.filter(book => book.status === "reading").length;
+  const finishedCount = library.filter(book => book.status === "finished").length;
+  const ratedBooks = library.filter(book => book.rating !== null);
+  const averageRating = ratedBooks.length === 0 ? 0 :
+    ratedBooks.reduce((acc, book) => acc + (book.rating ?? 0), 0) / ratedBooks.length
+
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
       <div className="mx-auto max-w-7xl">
         <h1 className="mb-6 text-4xl font-bold">Book Tracking App</h1>
-        <StatsBar/>
+        <StatsBar 
+          toReadCount={toReadCount} 
+          readingCount={readingCount} 
+          finishedCount={finishedCount} 
+          averageRating={averageRating}/>
         <select 
           value = {filter}
           onChange = {(e) => setFilter(e.target.value as "all" | Book["status"])}
@@ -126,6 +138,8 @@ function App() {
           <option value="descending">Descending</option>
         </select>
         <div>
+          {loading && <p>searching...</p>}
+          {error && <p>{error}</p>}
           <LibraryList libraryList={sortedBooks} deleteBook={deleteBook} changeStatus={changeStatus} changeRating={changeRating}/>
 
         </div>
