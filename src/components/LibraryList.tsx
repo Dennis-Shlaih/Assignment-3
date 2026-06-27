@@ -10,7 +10,7 @@ interface LibraryListProps {
 
 function LibraryList({libraryList, deleteBook, changeStatus, changeRating}: LibraryListProps) {
     if (libraryList.length === 0) {
-        return <p>Your library is empty.</p>;
+        return <p>Your library is empty or no books match the selected filter.</p>;
     }
     return (
         <div>

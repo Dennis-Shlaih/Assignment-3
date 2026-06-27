@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import {useEffect, useState} from 'react'
 import SearchBar from './components/SearchBar'
 import StatsBar from './components/StatsBar'
 import SearchResults from './components/SearchResults.tsx'
@@ -8,13 +8,30 @@ import type {Book} from './types/Book.ts'
 
 
 function App() {
-  const [library, setLibrary] = useState<Book[]>([]);
+  const [library, setLibrary] = useState<Book[]>(() => {
+    const raw = localStorage.getItem("library");
+    if (!raw) {
+      return [];
+    }
+    try {
+      return JSON.parse(raw);
+    }
+    catch {
+      return [];
+    }
+  });
+
   const [results, setResults] = useState<BookApi[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<"all" | Book["status"]>("all");
   const [sortBy, setSortBy] = useState<"title" | "author" | "date">("title")
   const [sortOrder, setSortOrder] = useState<"ascending" | "descending">("ascending") 
+
+  useEffect(() => {
+    localStorage.setItem("library", JSON.stringify(library));
+    console.log("saved", library.length, "books to localstorage.");
+  } ,[library])
 
   async function searchBooks(query: string) {
     try {
@@ -77,21 +94,21 @@ function App() {
   function sortBooks(filteredBooks: Book[]): Book[] {
     if (sortOrder === "ascending") {
       if (sortBy === "date") {
-        return filteredBooks.sort((a, b) => a.dateAdded - b.dateAdded);
+        return [...filteredBooks.sort((a, b) => a.dateAdded - b.dateAdded)];
       }
       else if (sortBy === "author") {
-        return filteredBooks.sort((a, b) => a.author.localeCompare(b.author));
+        return [...filteredBooks.sort((a, b) => a.author.localeCompare(b.author))];
       }
-      return filteredBooks.sort((a, b) => a.title.localeCompare(b.title))
+      return [...filteredBooks.sort((a, b) => a.title.localeCompare(b.title))];
     }
     else {
       if (sortBy === "date") {
-        return filteredBooks.sort((a, b) => b.dateAdded - a.dateAdded);
+        return [...filteredBooks.sort((a, b) => b.dateAdded - a.dateAdded)];
       }
       else if (sortBy === "author") {
-        return filteredBooks.sort((a, b) => b.author.localeCompare(a.author));
+        return [...filteredBooks.sort((a, b) => b.author.localeCompare(a.author))];
       }
-      return filteredBooks.sort((a, b) => b.title.localeCompare(a.title))
+      return [...filteredBooks.sort((a, b) => b.title.localeCompare(a.title))];
     }
   }
 
