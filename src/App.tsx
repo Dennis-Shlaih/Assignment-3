@@ -3,9 +3,9 @@ import SearchBar from './components/SearchBar'
 import StatsBar from './components/StatsBar'
 import SearchResults from './components/SearchResults.tsx'
 import LibraryList from './components/LibraryList.tsx'
+import ThemeToggle from './components/ThemeToggle.tsx'
 import type {BookApi} from './types/BookApi.ts'
 import type {Book} from './types/Book.ts'
-
 
 function App() {
   const [library, setLibrary] = useState<Book[]>(() => {
@@ -20,6 +20,19 @@ function App() {
       return [];
     }
   });
+  
+  const [darkMode, setDarkMode] = useState<boolean>(() => {
+    const savedTheme = localStorage.getItem("theme");
+    if (!savedTheme) {
+      return false;
+    }
+    try {
+      return JSON.parse(savedTheme);
+    }
+    catch {
+      return false;
+    }
+  });
 
   const [results, setResults] = useState<BookApi[]>([]);
   const [loading, setLoading] = useState(false);
@@ -30,8 +43,17 @@ function App() {
 
   useEffect(() => {
     localStorage.setItem("library", JSON.stringify(library));
-    console.log("saved", library.length, "books to localstorage.");
   } ,[library])
+
+  useEffect(() => {
+    if (darkMode) {
+        document.documentElement.classList.add("dark");
+    }
+    else {
+        document.documentElement.classList.remove("dark");
+    }
+    localStorage.setItem("theme", JSON.stringify(darkMode));
+  }, [darkMode])
 
   async function searchBooks(query: string) {
     try {
@@ -52,6 +74,10 @@ function App() {
     finally {
       setLoading(false);
     }
+  }
+
+  function toggleTheme() {
+    setDarkMode(prev => !prev)
   }
   
   function addBook(bookApi: BookApi): void {
@@ -85,7 +111,6 @@ function App() {
 
   function changeRating(id: string, rating: number): void {
     setLibrary(prev => prev.map(book => book.id === id ? {...book, rating} : book ))
-    {console.log(rating)}
   }
 
   const filteredBooks = filter === "all" ? library : 
@@ -94,21 +119,21 @@ function App() {
   function sortBooks(filteredBooks: Book[]): Book[] {
     if (sortOrder === "ascending") {
       if (sortBy === "date") {
-        return [...filteredBooks.sort((a, b) => a.dateAdded - b.dateAdded)];
+        return [...filteredBooks].sort((a, b) => a.dateAdded - b.dateAdded);
       }
       else if (sortBy === "author") {
-        return [...filteredBooks.sort((a, b) => a.author.localeCompare(b.author))];
+        return [...filteredBooks].sort((a, b) => a.author.localeCompare(b.author));
       }
-      return [...filteredBooks.sort((a, b) => a.title.localeCompare(b.title))];
+      return [...filteredBooks].sort((a, b) => a.title.localeCompare(b.title));
     }
     else {
       if (sortBy === "date") {
-        return [...filteredBooks.sort((a, b) => b.dateAdded - a.dateAdded)];
+        return [...filteredBooks].sort((a, b) => b.dateAdded - a.dateAdded);
       }
       else if (sortBy === "author") {
-        return [...filteredBooks.sort((a, b) => b.author.localeCompare(a.author))];
+        return [...filteredBooks].sort((a, b) => b.author.localeCompare(a.author));
       }
-      return [...filteredBooks.sort((a, b) => b.title.localeCompare(a.title))];
+      return [...filteredBooks].sort((a, b) => b.title.localeCompare(a.title));
     }
   }
 
@@ -122,43 +147,105 @@ function App() {
 
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
+    <div className="min-h-screen bg-slate-100 p-6 dark:bg-slate-900">
       <div className="mx-auto max-w-7xl">
-        <h1 className="mb-6 text-4xl font-bold">Book Tracking App</h1>
+        <div className="mb-6 flex items-center justify-between">
+          <h1 className="mb-6 text-4xl font-bold text-slate-900 dark:text-white">Book Tracker</h1>
+          <ThemeToggle
+          darkMode={darkMode}
+          toggleTheme={toggleTheme}
+          />
+        </div>
+        
         <StatsBar 
           toReadCount={toReadCount} 
           readingCount={readingCount} 
           finishedCount={finishedCount} 
           averageRating={averageRating}/>
-        <select 
-          value = {filter}
-          onChange = {(e) => setFilter(e.target.value as "all" | Book["status"])}
-        >
-          <option value="all">All</option>
-          <option value="to-read">To Read</option>
-          <option value="reading">Currently Reading</option>
-          <option value="finished">Finished Reading</option>
-        </select>
-        <select 
+        <div className="mb-6 my-5 flex flex-wrap items-center justify-center gap-3">
+          <select
+            className="
+              rounded-lg 
+              border 
+              border-gray-300 
+              bg-white 
+              px-3 
+              py-2 
+              text-sm 
+              text-slate-700 
+              shadow-sm 
+              focus:outline-none 
+              focus:ring-2 
+              focus:ring-blue-500 
+              dark:border-slate-600 
+              dark:bg-slate-800 
+              dark:text-slate-200" 
+            value = {filter}
+            onChange = {(e) => setFilter(e.target.value as "all" | Book["status"])}
+          >
+            <option value="all">All</option>
+            <option value="to-read">To Read</option>
+            <option value="reading">Currently Reading</option>
+            <option value="finished">Finished Reading</option>
+          </select>
+          
+          <select
+            className="
+              rounded-lg 
+              border 
+              border-gray-300 
+              bg-white 
+              px-3 
+              py-2 
+              text-sm 
+              text-slate-700 
+              shadow-sm 
+              focus:outline-none 
+              focus:ring-2 
+              focus:ring-blue-500 
+              dark:border-slate-600 
+              dark:bg-slate-800 
+              dark:text-slate-200" 
           value = {sortBy}
           onChange = {(e) => setSortBy(e.target.value as "title" | "author" | "date")}
-        >
-          <option value="title">Title</option>
-          <option value="author">Author</option>
-          <option value="date">Date Added</option>
-        </select>
-        <select 
+          >
+            <option value="title">Title</option>
+            <option value="author">Author</option>
+            <option value="date">Date Added</option>
+          </select>
+          <select
+            className="
+              rounded-lg 
+              border 
+              border-gray-300 
+              bg-white 
+              px-3 
+              py-2 
+              text-sm 
+              text-slate-700 
+              shadow-sm 
+              focus:outline-none 
+              focus:ring-2 
+              focus:ring-blue-500 
+              dark:border-slate-600 
+              dark:bg-slate-800 
+              dark:text-slate-200" 
           value = {sortOrder}
           onChange = {(e) => setSortOrder(e.target.value as "ascending" | "descending")}
         >
           <option value="ascending">Ascending</option>
           <option value="descending">Descending</option>
         </select>
-        <div>
-          {loading && <p>searching...</p>}
-          {error && <p>{error}</p>}
+        </div>
+        
+        <div className="my-6">
+          {loading && 
+            <p className="py-4 text-sm text-slate-500 dark:text-slate-400">Searching...</p>
+          }
+          {error && 
+          <p className="py-4 text-sm text-red-500">{error}</p>
+          }
           <LibraryList libraryList={sortedBooks} deleteBook={deleteBook} changeStatus={changeStatus} changeRating={changeRating}/>
-
         </div>
         <SearchBar onSearch={searchBooks}/>
         <SearchResults loadedData={results} onAdd={addBook}/>
