@@ -40,6 +40,7 @@ function App() {
   const [filter, setFilter] = useState<"all" | Book["status"]>("all");
   const [sortBy, setSortBy] = useState<"title" | "author" | "date">("title")
   const [sortOrder, setSortOrder] = useState<"ascending" | "descending">("ascending") 
+  const [hasSearched, setHasSearched] = useState<boolean>(false);
 
   useEffect(() => {
     localStorage.setItem("library", JSON.stringify(library));
@@ -60,6 +61,7 @@ function App() {
       setResults([]);
       setLoading(true);
       setError(null);
+      setHasSearched(true)
       const response = await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=10`);
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
@@ -248,7 +250,7 @@ function App() {
           <LibraryList libraryList={sortedBooks} deleteBook={deleteBook} changeStatus={changeStatus} changeRating={changeRating}/>
         </div>
         <SearchBar onSearch={searchBooks}/>
-        <SearchResults loadedData={results} onAdd={addBook}/>
+        <SearchResults loadedData={results} onAdd={addBook} hasSearched={hasSearched}/>
       </div>
     </div>
   );

@@ -1,10 +1,15 @@
 import type {BookApi} from '../types/BookApi.ts'
+
 interface SearchResultsProps {
     loadedData: BookApi[];
     onAdd: (bookApi: BookApi) => void;
+    hasSearched: boolean
 }
 
-function SearchResults({loadedData, onAdd}: SearchResultsProps) {    
+function SearchResults({loadedData, onAdd, hasSearched}: SearchResultsProps) {  
+    if (!hasSearched) {
+        return <p className="py-6 text-sm text-slate-500 dark:text-slate-400">Search for a book to get started!.</p>;
+    }
     if (loadedData.length === 0) {
         return <p className="py-6 text-sm text-slate-500 dark:text-slate-400">No books found.</p>;
     }
